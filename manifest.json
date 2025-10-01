@@ -1,0 +1,8 @@
+{
+  "name": "Fire Shader Effect",
+  "description": "Contrôle séparé Intensité/Hauteur - Paramètre height pour taille du feu",
+  "type": "effects",
+  "version": "1.7.0",
+  "author": "MyWallpaper",
+  "tags": ["effect", "animation", "shader", "fire"]
+}
