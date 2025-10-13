@@ -5,20 +5,26 @@ class FireShaderAddon {
         this.gl = null;
         this.program = null;
         this.startTime = Date.now();
-        
-        // Default settings
+        this.layerId = window.MYWALLPAPER_LAYER_ID;
+        this.isFirstRender = true;
+
+        // ✅ Read pre-injected config from MyWallpaper (avoids race condition)
+        const config = window.MYWALLPAPER_CONFIG || {};
+
+        // Default settings merged with pre-injected config
         this.settings = {
-            primaryColor: '#FF6B35',    // Orange-rouge principal
-            secondaryColor: '#FF0000',  // Rouge secondaire  
-            intensity: 0.9,             // Intensité du feu (luminosité)
-            speed: 0.2,                 // Vitesse d'animation
-            scale: 7.0,                 // Échelle du bruit
-            turbulence: 0.9,            // Turbulence
-            height: 1.0,                // Hauteur du feu
-            opacity: 1.0                // Opacité globale
+            primaryColor: config.primaryColor ?? '#FF6B35',
+            secondaryColor: config.secondaryColor ?? '#FF0000',
+            intensity: config.intensity ?? 0.9,
+            speed: config.speed ?? 0.2,
+            scale: config.scale ?? 7.0,
+            turbulence: config.turbulence ?? 0.9,
+            height: config.height ?? 1.0,
+            opacity: config.opacity ?? 1.0
         };
-        
+
         this.init();
+        console.log('🔥 Fire Shader initialized with config:', this.settings);
     }
     
     init() {
@@ -258,33 +264,43 @@ class FireShaderAddon {
             requestAnimationFrame(this.render);
             return;
         }
-        
+
         // Mise à jour des uniforms
         const currentTime = (Date.now() - this.startTime) / 1000;
-        
+
         this.gl.uniform1f(this.uniforms.time, currentTime);
         this.gl.uniform2fv(this.uniforms.resolution, [this.canvas.width, this.canvas.height]);
-        
+
         // Effacer avec transparence
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        
+
         // Conversion des couleurs
         const primaryRgb = this.hexToRgb(this.settings.primaryColor);
         const secondaryRgb = this.hexToRgb(this.settings.secondaryColor);
-        
+
         this.gl.uniform3fv(this.uniforms.primaryColor, primaryRgb);
         this.gl.uniform3fv(this.uniforms.secondaryColor, secondaryRgb);
-        
+
         this.gl.uniform1f(this.uniforms.intensity, this.settings.intensity);
         this.gl.uniform1f(this.uniforms.speed, this.settings.speed);
         this.gl.uniform1f(this.uniforms.scale, this.settings.scale);
         this.gl.uniform1f(this.uniforms.turbulence, this.settings.turbulence);
         this.gl.uniform1f(this.uniforms.height, this.settings.height);
         this.gl.uniform1f(this.uniforms.opacity, this.settings.opacity);
-        
+
         // Rendu
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-        
+
+        // ✅ Signal ADDON_READY after first frame rendered (for thumbnail generation)
+        if (this.isFirstRender && this.layerId) {
+            this.isFirstRender = false;
+            window.parent.postMessage({
+                type: 'ADDON_READY',
+                layerId: this.layerId
+            }, '*');
+            console.log('✅ Fire shader ready signal sent');
+        }
+
         requestAnimationFrame(this.render);
     }
     
