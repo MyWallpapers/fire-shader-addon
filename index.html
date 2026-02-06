@@ -1,13 +1,327 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fire Shader Addon</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire Shader Effect</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
 </head>
 <body>
-    <canvas id="fireCanvas"></canvas>
-    <script src="script.js"></script>
+  <canvas id="fireCanvas"></canvas>
+  <script>
+    class FireShaderAddon {
+      constructor() {
+        this.canvas = document.getElementById('fireCanvas');
+        this.gl = null;
+        this.program = null;
+        this.startTime = performance.now();
+        this.isFirstRender = true;
+        this.animationId = null;
+
+        const config = window.MyWallpaper?.config || {};
+
+        this.settings = {
+          primaryColor: config.primaryColor ?? '#FF6B35',
+          secondaryColor: config.secondaryColor ?? '#FF0000',
+          intensity: config.intensity ?? 0.9,
+          speed: config.speed ?? 0.2,
+          scale: config.scale ?? 7.0,
+          turbulence: config.turbulence ?? 0.9,
+          height: config.height ?? 1.0,
+          opacity: config.opacity ?? 1.0
+        };
+
+        this.handleResize = this.resize.bind(this);
+
+        this.init();
+      }
+
+      init() {
+        const rect = this.canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+          requestAnimationFrame(() => this.init());
+          return;
+        }
+
+        this.setupWebGL();
+        this.createShaderProgram();
+        this.setupEventListeners();
+        this.render();
+      }
+
+      setupWebGL() {
+        this.gl = this.canvas.getContext('webgl2', {
+          alpha: true,
+          premultipliedAlpha: false,
+          antialias: true
+        });
+
+        if (!this.gl) {
+          console.error('WebGL2 not supported');
+          return;
+        }
+
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+        this.resize();
+      }
+
+      resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const width = this.canvas.clientWidth * dpr;
+        const height = this.canvas.clientHeight * dpr;
+
+        if (this.canvas.width !== width || this.canvas.height !== height) {
+          this.canvas.width = width;
+          this.canvas.height = height;
+          if (this.gl) {
+            this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+          }
+        }
+      }
+
+      setupEventListeners() {
+        window.addEventListener('resize', this.handleResize);
+
+        if (window.MyWallpaper) {
+          const api = window.MyWallpaper;
+
+          api.onSettingsChange((newSettings) => {
+            Object.assign(this.settings, newSettings);
+          });
+
+          api.onEvent('viewport:resize', () => this.resize());
+          api.onPause(() => this.stop());
+          api.onResume(() => this.start());
+          api.onUnmount(() => this.dispose());
+
+          api.ready({
+            capabilities: ['hot-reload'],
+            subscribedEvents: ['viewport:resize']
+          });
+        }
+      }
+
+      createShaderProgram() {
+        const gl = this.gl;
+
+        const vertexShaderSource = `#version 300 es
+          precision mediump float;
+          const vec2 positions[6] = vec2[6](
+            vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(-1.0, 1.0),
+            vec2(-1.0, 1.0), vec2(1.0, -1.0), vec2(1.0, 1.0)
+          );
+          out vec2 uv;
+          void main() {
+            uv = positions[gl_VertexID];
+            gl_Position = vec4(positions[gl_VertexID], 0.0, 1.0);
+          }
+        `;
+
+        const fragmentShaderSource = `#version 300 es
+          precision highp float;
+
+          uniform float time;
+          uniform vec2 resolution;
+          uniform vec3 primaryColor;
+          uniform vec3 secondaryColor;
+          uniform float intensity;
+          uniform float speed;
+          uniform float scale;
+          uniform float turbulence;
+          uniform float height;
+          uniform float opacity;
+
+          in vec2 uv;
+          out vec4 fragColor;
+
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+          }
+
+          float noise(vec2 st) {
+            vec2 i = floor(st);
+            vec2 f = fract(st);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+
+            float a = random(i);
+            float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0));
+            float d = random(i + vec2(1.0, 1.0));
+
+            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+          }
+
+          #define OCTAVES 5
+          float fbm(vec2 st) {
+            float value = 0.0;
+            float amplitude = 0.4;
+            vec2 freq = st;
+
+            for (int i = 0; i < OCTAVES; i++) {
+              value += amplitude * noise(freq);
+              freq *= 2.0;
+              amplitude *= 0.4;
+            }
+            return value;
+          }
+
+          void main() {
+            vec2 st = uv;
+
+            float aspectRatio = resolution.x / resolution.y;
+            st.x *= aspectRatio;
+
+            vec2 fireCoords = vec2(st.x, st.y - time * speed) * scale;
+
+            float gradient = mix(st.y * 0.3, st.y * 0.7, fbm(fireCoords));
+
+            float noise1 = fbm(fireCoords);
+            float noise2 = turbulence * fbm(fireCoords + noise1 + time) - 0.5;
+
+            float finalNoise = turbulence * fbm(vec2(noise1, noise2));
+            float fireIntensity = fbm(vec2(noise2, noise1));
+
+            vec3 fireColor = mix(secondaryColor, primaryColor, fireIntensity);
+            vec3 finalColor = fireColor * intensity;
+
+            float fireAlpha = smoothstep(0.0, 1.0, (fireIntensity - gradient + 0.3) * height);
+
+            fragColor = vec4(finalColor, fireAlpha * opacity);
+          }
+        `;
+
+        const vertexShader = this.compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+        const fragmentShader = this.compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+
+        if (!vertexShader || !fragmentShader) return;
+
+        this.program = gl.createProgram();
+        gl.attachShader(this.program, vertexShader);
+        gl.attachShader(this.program, fragmentShader);
+        gl.linkProgram(this.program);
+
+        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+          console.error('Program link failed:', gl.getProgramInfoLog(this.program));
+          return;
+        }
+
+        gl.detachShader(this.program, vertexShader);
+        gl.deleteShader(vertexShader);
+        gl.detachShader(this.program, fragmentShader);
+        gl.deleteShader(fragmentShader);
+
+        gl.useProgram(this.program);
+
+        this.uniforms = {
+          time: gl.getUniformLocation(this.program, 'time'),
+          resolution: gl.getUniformLocation(this.program, 'resolution'),
+          primaryColor: gl.getUniformLocation(this.program, 'primaryColor'),
+          secondaryColor: gl.getUniformLocation(this.program, 'secondaryColor'),
+          intensity: gl.getUniformLocation(this.program, 'intensity'),
+          speed: gl.getUniformLocation(this.program, 'speed'),
+          scale: gl.getUniformLocation(this.program, 'scale'),
+          turbulence: gl.getUniformLocation(this.program, 'turbulence'),
+          height: gl.getUniformLocation(this.program, 'height'),
+          opacity: gl.getUniformLocation(this.program, 'opacity')
+        };
+      }
+
+      compileShader(source, type) {
+        const shader = this.gl.createShader(type);
+        this.gl.shaderSource(shader, source);
+        this.gl.compileShader(shader);
+
+        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+          console.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+          this.gl.deleteShader(shader);
+          return null;
+        }
+
+        return shader;
+      }
+
+      hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex);
+        return result ? [
+          parseInt(result[1], 16) / 255,
+          parseInt(result[2], 16) / 255,
+          parseInt(result[3], 16) / 255
+        ] : [1, 1, 1];
+      }
+
+      render = () => {
+        if (!this.gl || !this.program) {
+          this.animationId = requestAnimationFrame(this.render);
+          return;
+        }
+
+        const gl = this.gl;
+        const currentTime = (performance.now() - this.startTime) / 1000;
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.uniform1f(this.uniforms.time, currentTime);
+        gl.uniform2fv(this.uniforms.resolution, [this.canvas.width, this.canvas.height]);
+
+        gl.uniform3fv(this.uniforms.primaryColor, this.hexToRgb(this.settings.primaryColor));
+        gl.uniform3fv(this.uniforms.secondaryColor, this.hexToRgb(this.settings.secondaryColor));
+
+        gl.uniform1f(this.uniforms.intensity, this.settings.intensity);
+        gl.uniform1f(this.uniforms.speed, this.settings.speed);
+        gl.uniform1f(this.uniforms.scale, this.settings.scale);
+        gl.uniform1f(this.uniforms.turbulence, this.settings.turbulence);
+        gl.uniform1f(this.uniforms.height, this.settings.height);
+        gl.uniform1f(this.uniforms.opacity, this.settings.opacity);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        if (this.isFirstRender && window.MyWallpaper) {
+          this.isFirstRender = false;
+          window.MyWallpaper.renderComplete();
+        }
+
+        this.animationId = requestAnimationFrame(this.render);
+      }
+
+      start() {
+        if (!this.animationId) {
+          this.render();
+        }
+      }
+
+      stop() {
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+          this.animationId = null;
+        }
+      }
+
+      dispose() {
+        this.stop();
+        if (this.gl && this.program) {
+          this.gl.deleteProgram(this.program);
+          this.program = null;
+        }
+        this.gl = null;
+        this.canvas = null;
+        window.removeEventListener('resize', this.handleResize);
+      }
+    }
+
+    if (document.readyState === 'complete') {
+      window.fireShader = new FireShaderAddon();
+    } else {
+      window.addEventListener('load', () => {
+        window.fireShader = new FireShaderAddon();
+      });
+    }
+  </script>
 </body>
 </html>

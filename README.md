@@ -1,78 +1,55 @@
-# 🔥 Fire Shader Addon
+# Fire Shader Effect Add-on for MyWallpaper
 
-Addon d'effet de feu animé en temps réel pour MyWallpaper utilisant WebGL avec des paramètres entièrement personnalisables.
+Realistic animated fire effect with customizable colors and fluid dynamics. Pure WebGL2 shader with Fractal Brownian Motion.
 
-## ✨ Fonctionnalités
+![MyWallpaper Add-on](https://img.shields.io/badge/MyWallpaper-Add--on-purple?style=for-the-badge)
+![SDK Version](https://img.shields.io/badge/SDK-2.17.1-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-- **Effet de feu réaliste** : Utilise des shaders WebGL pour un rendu fluide
-- **Entièrement personnalisable** : Couleurs, intensité, vitesse, échelle
-- **Performance optimisée** : WebGL2 pour un rendu 60fps
-- **Responsive** : S'adapte à toutes les résolutions d'écran
-- **Intégration MyWallpaper** : Communication temps réel avec l'interface
+## Settings
 
-## 🎮 Paramètres
+### Colors
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| Primary Color | color | `#FF6B35` | Main fire color |
+| Secondary Color | color | `#FF0000` | Deep flame color |
 
-### Couleurs
-- **Couleur Principale** : Orange-rouge principal du feu
-- **Couleur Secondaire** : Rouge foncé des flammes intenses
-- **Couleur de Fond** : Arrière-plan (généralement noir)
+### Motion
+| Setting | Range | Default | Description |
+|---------|-------|---------|-------------|
+| Speed | 0 - 1 | 0.2 | Flame animation speed |
 
-### Animation
-- **Intensité** : Contrôle la force générale de l'effet (0.0-2.0)
-- **Vitesse** : Vitesse de montée des flammes (0.0-1.0)
-- **Turbulence** : Niveau de chaos dans le mouvement (0.0-2.0)
+### Appearance
+| Setting | Range | Default | Description |
+|---------|-------|---------|-------------|
+| Intensity | 0 - 2 | 0.9 | Overall fire brightness |
+| Scale | 1 - 15 | 7.0 | Detail size (smaller = more details) |
+| Turbulence | 0 - 2 | 0.9 | Chaos and movement level |
+| Height | 0.3 - 3 | 1.0 | Vertical size of flames |
+| Opacity | 0 - 1 | 1.0 | Overall transparency |
 
-### Rendu
-- **Échelle** : Taille des détails (1.0-15.0, plus petit = plus de détails)
-- **Opacité** : Transparence globale (0.0-1.0)
+## Installation
 
-## 🚀 Installation
+1. Download or clone this repository
+2. In MyWallpaper, go to **Add-ons** > **Install from folder**
+3. Select the `fire-shader-addon` folder
 
-1. Téléchargez ou clonez ce repository
-2. Assurez-vous d'avoir tous les fichiers requis :
-   - `index.html`
-   - `script.js` 
-   - `styles.css`
-   - `addon.json`
-   - `preview.png` (à ajouter)
-3. Créez une release GitHub avec un tag de version
-4. Ajoutez l'URL du repository dans MyWallpaper
+## Development
 
-## 🔧 Développement
-
-Le shader utilise plusieurs techniques :
-- **Fractional Brownian Motion (FBM)** pour le bruit fractal
-- **Interpolation cubique** pour des transitions fluides  
-- **Multicouches de bruit** pour la complexité visuelle
-- **Gradient dynamique** pour l'effet de flamme qui monte
-
-### Structure du code
-
-```javascript
-// Shaders
-- Vertex Shader : Position des vertices
-- Fragment Shader : Calcul des couleurs pixel par pixel
-
-// Classes principales
-- FireShaderAddon : Gestionnaire principal
-- WebGL setup : Initialisation du contexte
-- Settings management : Gestion des paramètres temps réel
+```bash
+npx serve . -p 3000
+# In MyWallpaper: Settings > Developer > Enter http://localhost:3000 > Test
 ```
 
-## 📋 Compatibilité
+## Technical Details
 
-- **WebGL2** requis (navigateurs modernes)
-- **Toutes résolutions** supportées
-- **Performance** : ~60fps sur hardware moderne
+- **WebGL2 only** (`#version 300 es`)
+- **5-octave Fractal Brownian Motion** for realistic flames
+- **Domain warping** for organic fire movement
+- `performance.now()` for sub-millisecond timing
+- Shader cleanup after linkage
+- Proper lifecycle management (pause/resume/dispose)
 
-## 🎨 Personnalisation
+## License
 
-L'addon suit les conventions MyWallpaper :
-- Communication via `postMessage`
-- Paramètres définis dans `addon.json`
-- Design responsive avec unités relatives
-- Intégration transparente
-
-## 📝 Licence
-
-Créé pour MyWallpaper - Inspiré du code de démonstration fourni, entièrement réécrit pour éviter les problèmes de droits d'auteur.
+MIT License

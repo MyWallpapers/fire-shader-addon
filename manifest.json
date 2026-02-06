@@ -1,76 +1,109 @@
 {
   "name": "Fire Shader Effect",
-  "version": "1.8.0",
-  "description": "Contrôle séparé Intensité/Hauteur - Paramètre height pour taille du feu",
-  "author": "MyWallpaper",
-  "type": "effects",
-  "tags": ["effect", "animation", "shader", "fire"],
+  "version": "2.0.0",
+  "sdkVersion": "2.17.1",
+  "description": "Realistic animated fire effect with customizable colors and fluid dynamics. WebGL2 shader with Fractal Brownian Motion.",
+  "author": "MyWallpaper Community",
+  "type": "widget",
+  "categories": ["effects", "animations", "backgrounds"],
+  "license": "MIT",
+  "repository": "https://github.com/rayandu924/fire-shader-addon",
+
+  "capabilities": {
+    "hotReload": true,
+    "systemEvents": ["viewport:resize"]
+  },
+
+  "defaultLayout": {
+    "xPercent": 0,
+    "yPercent": 0,
+    "widthPercent": 100,
+    "heightPercent": 100,
+    "rotation": 0
+  },
+
+  "ui": {
+    "pointerEvents": "none"
+  },
+
   "settings": {
+    "colorsSection": {
+      "type": "section",
+      "label": "🎨 Colors"
+    },
     "primaryColor": {
       "type": "color",
-      "label": "Couleur Principale",
-      "description": "Couleur principale du feu (orange-rouge)",
+      "label": "Primary Color",
       "default": "#FF6B35"
     },
     "secondaryColor": {
       "type": "color",
-      "label": "Couleur Secondaire",
-      "description": "Couleur secondaire du feu (rouge foncé)",
+      "label": "Secondary Color",
       "default": "#FF0000"
     },
-    "intensity": {
-      "type": "range",
-      "label": "Intensité du Feu",
-      "description": "Contrôle l'intensité générale de l'effet de feu",
-      "default": 0.9,
-      "min": 0.0,
-      "max": 2.0,
-      "step": 0.1
+
+    "motionSection": {
+      "type": "section",
+      "label": "🔥 Motion"
     },
     "speed": {
       "type": "range",
-      "label": "Vitesse d'Animation",
-      "description": "Vitesse de mouvement des flammes",
-      "default": 0.2,
+      "label": "Speed",
+      "description": "Flame animation speed",
       "min": 0.0,
       "max": 1.0,
-      "step": 0.05
+      "step": 0.05,
+      "default": 0.2
+    },
+
+    "appearanceSection": {
+      "type": "section",
+      "label": "🌫️ Appearance"
+    },
+    "intensity": {
+      "type": "range",
+      "label": "Intensity",
+      "description": "Overall fire brightness",
+      "min": 0.0,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 0.9
     },
     "scale": {
       "type": "range",
-      "label": "Échelle du Motif",
-      "description": "Taille des détails du feu (plus petit = plus de détails)",
-      "default": 7.0,
+      "label": "Scale",
+      "description": "Size of fire details (smaller = more details)",
       "min": 1.0,
       "max": 15.0,
-      "step": 0.5
+      "step": 0.5,
+      "default": 7.0
     },
     "turbulence": {
       "type": "range",
       "label": "Turbulence",
-      "description": "Niveau de chaos et de mouvement dans les flammes",
-      "default": 0.9,
+      "description": "Chaos and movement level",
       "min": 0.0,
       "max": 2.0,
-      "step": 0.1
+      "step": 0.1,
+      "default": 0.9
     },
     "height": {
       "type": "range",
-      "label": "Hauteur du Feu",
-      "description": "Contrôle la taille verticale des flammes",
-      "default": 1.0,
+      "label": "Height",
+      "description": "Vertical size of flames",
       "min": 0.3,
       "max": 3.0,
-      "step": 0.1
+      "step": 0.1,
+      "default": 1.0
     },
     "opacity": {
       "type": "range",
-      "label": "Opacité",
-      "description": "Transparence globale de l'effet",
-      "default": 1.0,
+      "label": "Opacity",
+      "description": "Overall transparency",
       "min": 0.0,
       "max": 1.0,
-      "step": 0.05
+      "step": 0.05,
+      "default": 1.0
     }
   }
 }
