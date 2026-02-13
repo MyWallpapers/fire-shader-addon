@@ -1,19 +1,25 @@
 {
   "name": "Fire Shader Effect",
-  "version": "2.0.0",
-  "sdkVersion": "2.17.1",
+  "version": "2.1.0",
+  "sdkVersion": "2.1",
   "description": "Realistic animated fire effect with customizable colors and fluid dynamics. WebGL2 shader with Fractal Brownian Motion.",
   "author": "MyWallpaper Community",
   "type": "widget",
-  "categories": ["effects", "animations", "backgrounds"],
+  "categories": [
+    "effects",
+    "animations",
+    "backgrounds"
+  ],
   "license": "MIT",
   "repository": "https://github.com/rayandu924/fire-shader-addon",
-
+  "renderMode": "native",
+  "entry": "index.js",
   "capabilities": {
     "hotReload": true,
-    "systemEvents": ["viewport:resize"]
+    "systemEvents": [
+      "viewport:resize"
+    ]
   },
-
   "defaultLayout": {
     "xPercent": 0,
     "yPercent": 0,
@@ -21,15 +27,13 @@
     "heightPercent": 100,
     "rotation": 0
   },
-
   "ui": {
     "pointerEvents": "none"
   },
-
   "settings": {
     "colorsSection": {
       "type": "section",
-      "label": "🎨 Colors"
+      "label": "\ud83c\udfa8 Colors"
     },
     "primaryColor": {
       "type": "color",
@@ -41,10 +45,9 @@
       "label": "Secondary Color",
       "default": "#FF0000"
     },
-
     "motionSection": {
       "type": "section",
-      "label": "🔥 Motion"
+      "label": "\ud83d\udd25 Motion"
     },
     "speed": {
       "type": "range",
@@ -55,10 +58,9 @@
       "step": 0.05,
       "default": 0.2
     },
-
     "appearanceSection": {
       "type": "section",
-      "label": "🌫️ Appearance"
+      "label": "\ud83c\udf2b\ufe0f Appearance"
     },
     "intensity": {
       "type": "range",
