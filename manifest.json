@@ -1,6 +1,6 @@
 {
   "name": "Fire Shader Effect",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Realistic animated fire effect with customizable colors and fluid dynamics. WebGL2 shader with Fractal Brownian Motion.",
   "author": "MyWallpaper Community",
   "type": "widget",
@@ -25,79 +25,101 @@
   "settings": {
     "colorsSection": {
       "type": "section",
-      "label": "🎨 Colors"
+      "content": {
+        "label": "🎨 Colors"
+      }
     },
     "primaryColor": {
       "type": "color",
-      "label": "Primary Color",
-      "default": "#FF6B35"
+      "content": {
+        "label": "Primary Color",
+        "default": "#FF6B35"
+      }
     },
     "secondaryColor": {
       "type": "color",
-      "label": "Secondary Color",
-      "default": "#FF0000"
+      "content": {
+        "label": "Secondary Color",
+        "default": "#FF0000"
+      }
     },
     "motionSection": {
       "type": "section",
-      "label": "🔥 Motion"
+      "content": {
+        "label": "🔥 Motion"
+      }
     },
     "speed": {
       "type": "range",
-      "label": "Speed",
-      "description": "Flame animation speed",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.05,
-      "default": 0.2
+      "content": {
+        "label": "Speed",
+        "description": "Flame animation speed",
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "default": 0.2
+      }
     },
     "appearanceSection": {
       "type": "section",
-      "label": "🌫️ Appearance"
+      "content": {
+        "label": "🌫️ Appearance"
+      }
     },
     "intensity": {
       "type": "range",
-      "label": "Intensity",
-      "description": "Overall fire brightness",
-      "min": 0.0,
-      "max": 2.0,
-      "step": 0.1,
-      "default": 0.9
+      "content": {
+        "label": "Intensity",
+        "description": "Overall fire brightness",
+        "min": 0,
+        "max": 2,
+        "step": 0.1,
+        "default": 0.9
+      }
     },
     "scale": {
       "type": "range",
-      "label": "Scale",
-      "description": "Size of fire details (smaller = more details)",
-      "min": 1.0,
-      "max": 15.0,
-      "step": 0.5,
-      "default": 7.0
+      "content": {
+        "label": "Scale",
+        "description": "Size of fire details (smaller = more details)",
+        "min": 1,
+        "max": 15,
+        "step": 0.5,
+        "default": 7
+      }
     },
     "turbulence": {
       "type": "range",
-      "label": "Turbulence",
-      "description": "Chaos and movement level",
-      "min": 0.0,
-      "max": 2.0,
-      "step": 0.1,
-      "default": 0.9
+      "content": {
+        "label": "Turbulence",
+        "description": "Chaos and movement level",
+        "min": 0,
+        "max": 2,
+        "step": 0.1,
+        "default": 0.9
+      }
     },
     "height": {
       "type": "range",
-      "label": "Height",
-      "description": "Vertical size of flames",
-      "min": 0.3,
-      "max": 3.0,
-      "step": 0.1,
-      "default": 1.0
+      "content": {
+        "label": "Height",
+        "description": "Vertical size of flames",
+        "min": 0.3,
+        "max": 3,
+        "step": 0.1,
+        "default": 1
+      }
     },
     "opacity": {
       "type": "range",
-      "label": "Opacity",
-      "description": "Overall transparency",
-      "min": 0.0,
-      "max": 1.0,
-      "step": 0.05,
-      "default": 1.0
+      "content": {
+        "label": "Opacity",
+        "description": "Overall transparency",
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "default": 1
+      }
     }
   }
 }
