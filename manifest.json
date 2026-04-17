@@ -10,7 +10,7 @@
     "backgrounds"
   ],
   "license": "MIT",
-  "repository": "https://github.com/MyWallpapers/fire-shader-addon",
+  "repository": "https://github.com/MyWallpapers/mywallpaper-addon-fire-shader",
   "entry": "index.js",
   "defaultLayout": {
     "xPercent": 0,
