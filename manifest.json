@@ -1,6 +1,6 @@
 {
   "name": "Fire Shader Effect",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Realistic animated fire effect with customizable colors and fluid dynamics. WebGL2 shader with Fractal Brownian Motion.",
   "author": "MyWallpaper Community",
   "type": "widget",

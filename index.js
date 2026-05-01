@@ -1,6 +1,20 @@
-import { jsx as S } from "react/jsx-runtime";
-import { useSettings as C, useViewport as R } from "@mywallpaper/sdk-react";
-import { useRef as s, useEffect as _ } from "react";
+const __MYWALLPAPER_WIDGET_RUNTIME_CONTRACT__ = "1";
+if (!__canvasRuntime) {
+      throw new Error('Canvas runtime globals are unavailable');
+    }
+if (!__canvasRuntime.react || !__canvasRuntime.reactJsxRuntime || !__canvasRuntime.sdkReact || !__canvasRuntime.sdkContracts || !__canvasRuntime.sdkPermissions) {
+      throw new Error('Canvas runtime globals are unavailable');
+    }
+const __canvasRuntimeReact = __canvasRuntime.react;
+const __canvasRuntimeJsxRuntime = __canvasRuntime.reactJsxRuntime;
+const __canvasRuntimeSdk = __canvasRuntime.sdkReact;
+const __canvasRuntimeSdkContracts = __canvasRuntime.sdkContracts;
+const __canvasRuntimeSdkPermissions = __canvasRuntime.sdkPermissions;
+const S = __canvasRuntimeJsxRuntime.jsx;
+const C = __canvasRuntimeSdk.useSettings;
+const R = __canvasRuntimeSdk.useViewport;
+const s = __canvasRuntimeReact.useRef;
+const _ = __canvasRuntimeReact.useEffect;
 const x = `#version 300 es
 precision mediump float;
 const vec2 positions[6] = vec2[6](
